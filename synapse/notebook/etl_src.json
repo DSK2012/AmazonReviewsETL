@@ -18,14 +18,11 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d1e660b9-a134-4223-a991-b0e619690578"
+				"spark.autotune.trackingId": "132692ea-d405-44f5-b039-2f17b51be05d"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
-			"synapse_widget": {
-				"version": "0.1"
-			},
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
@@ -41,14 +38,13 @@
 				"endpoint": "https://synapse-reviews-wsp.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/etlsparkpl",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.3",
 				"nodeCount": 10,
 				"cores": 4,
 				"memory": 28,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -58,7 +54,7 @@
 				"source": [
 					"data = spark.read.options(header = \"True\",delimiter = '\\t').csv(\"abfss://synapsedatalake@reviewsprojectstrgacc.dfs.core.windows.net/amazon_reviews_us_Wireless_v1_00.tsv\", )"
 				],
-				"execution_count": 3
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -74,9 +70,120 @@
 					}
 				},
 				"source": [
-					"data.schema"
+					"data.select(['verified_purchase','total_votes']).show(10)"
 				],
-				"execution_count": 6
+				"execution_count": 37
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data.printSchema()"
+				],
+				"execution_count": 31
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data.columns"
+				],
+				"execution_count": 23
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data = data.withColumn(\"star_rating\",data.star_rating.cast('int'))\n",
+					"data = data.withColumn(\"helpful_votes\",data.star_rating.cast('int'))\n",
+					"data = data.withColumn(\"total_votes\",data.star_rating.cast('int'))\n",
+					"data = data.withColumn(\"verified_purchase\",data.verified_purchase.cast('boolean'))"
+				],
+				"execution_count": 27
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data.columns"
+				],
+				"execution_count": 28
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data.printSchema()"
+				],
+				"execution_count": 35
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data.select(['verified_purchase','total_votes']).show(10)"
+				],
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -93,7 +200,8 @@
 				},
 				"source": [
 					""
-				]
+				],
+				"execution_count": null
 			}
 		]
 	}
