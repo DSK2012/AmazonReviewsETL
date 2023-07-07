@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "132692ea-d405-44f5-b039-2f17b51be05d"
+				"spark.autotune.trackingId": "1900a011-0eab-47bb-91d3-2625d351c85b"
 			}
 		},
 		"metadata": {
@@ -54,7 +54,7 @@
 				"source": [
 					"data = spark.read.options(header = \"True\",delimiter = '\\t').csv(\"abfss://synapsedatalake@reviewsprojectstrgacc.dfs.core.windows.net/amazon_reviews_us_Wireless_v1_00.tsv\", )"
 				],
-				"execution_count": 36
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -72,7 +72,7 @@
 				"source": [
 					"data.select(['verified_purchase','total_votes']).show(10)"
 				],
-				"execution_count": 37
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -90,7 +90,7 @@
 				"source": [
 					"data.printSchema()"
 				],
-				"execution_count": 31
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -108,7 +108,7 @@
 				"source": [
 					"data.columns"
 				],
-				"execution_count": 23
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"data = data.withColumn(\"total_votes\",data.star_rating.cast('int'))\n",
 					"data = data.withColumn(\"verified_purchase\",data.verified_purchase.cast('boolean'))"
 				],
-				"execution_count": 27
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -147,7 +147,7 @@
 				"source": [
 					"data.columns"
 				],
-				"execution_count": 28
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -165,7 +165,7 @@
 				"source": [
 					"data.printSchema()"
 				],
-				"execution_count": 35
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -181,9 +181,12 @@
 					}
 				},
 				"source": [
-					"data.select(['verified_purchase','total_votes']).show(10)"
+					"from pyspark.sql.functions import col,isnan, when, count\n",
+					"columns_list = data.columns\n",
+					"columns_list.remove('verified_purchase')\n",
+					"data.select([count(when(isnan(c) | col(c).isNull(), c)).alias(c) for c in columns_list]).show()"
 				],
-				"execution_count": 30
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
