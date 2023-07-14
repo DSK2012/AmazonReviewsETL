@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1900a011-0eab-47bb-91d3-2625d351c85b"
+				"spark.autotune.trackingId": "be6eeb03-dc1d-4566-81fb-38217e713e8a"
 			}
 		},
 		"metadata": {
@@ -51,10 +51,28 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql.functions import col,isnan, when, count, length, trim"
+				],
+				"execution_count": 19
+			},
+			{
+				"cell_type": "code",
 				"source": [
 					"data = spark.read.options(header = \"True\",delimiter = '\\t').csv(\"abfss://synapsedatalake@reviewsprojectstrgacc.dfs.core.windows.net/amazon_reviews_us_Wireless_v1_00.tsv\", )"
 				],
-				"execution_count": 1
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -72,7 +90,7 @@
 				"source": [
 					"data.select(['verified_purchase','total_votes']).show(10)"
 				],
-				"execution_count": 2
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -90,7 +108,7 @@
 				"source": [
 					"data.printSchema()"
 				],
-				"execution_count": 3
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -108,7 +126,7 @@
 				"source": [
 					"data.columns"
 				],
-				"execution_count": 4
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +147,7 @@
 					"data = data.withColumn(\"total_votes\",data.star_rating.cast('int'))\n",
 					"data = data.withColumn(\"verified_purchase\",data.verified_purchase.cast('boolean'))"
 				],
-				"execution_count": 5
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -147,7 +165,7 @@
 				"source": [
 					"data.columns"
 				],
-				"execution_count": 6
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -165,7 +183,7 @@
 				"source": [
 					"data.printSchema()"
 				],
-				"execution_count": 7
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -181,12 +199,101 @@
 					}
 				},
 				"source": [
-					"from pyspark.sql.functions import col,isnan, when, count\n",
 					"columns_list = data.columns\n",
 					"columns_list.remove('verified_purchase')\n",
 					"data.select([count(when(isnan(c) | col(c).isNull(), c)).alias(c) for c in columns_list]).show()"
 				],
-				"execution_count": 37
+				"execution_count": 27
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data_clean = data.dropna()"
+				],
+				"execution_count": 28
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data_clean.filter(length(trim(col(\"review_body\"))) <= 4).count()"
+				],
+				"execution_count": 29
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data_less_rev_length = data_clean.filter(length(trim(col(\"review_body\"))) > 4)"
+				],
+				"execution_count": 30
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data_less_rev_length.show(5)"
+				],
+				"execution_count": 31
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data_less_rev_length.count()"
+				],
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
